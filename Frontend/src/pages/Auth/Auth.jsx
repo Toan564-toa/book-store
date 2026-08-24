@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import AuthForm from "../components/AuthForm";
-import { login, register } from "../services/authService";
+import AuthForm from "./components/AuthForm";
+import { login, register } from "../../services/authService";
 import { Form, message } from "antd";
 
 const Auth = () => {

@@ -13,7 +13,7 @@ export async function listBooks(req: Request, res: Response) {
     maxPrice,
     sort = BOOK_SORT_OPTIONS.NEWEST,
     page = 1,
-    limit = 10,
+    limit = 8,
   } = req.query;
 
   const query: Record<string, any> = { status: { $ne: BOOK_STATUS.INACTIVE } };

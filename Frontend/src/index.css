@@ -4,3 +4,22 @@ body {
   margin: 0;
 }
 
+.banner{
+  background-image: url(Banner.png);
+}
+
+.user-menu,
+.user-menu-popup {
+  border-inline-end: none !important;
+  background: transparent !important;
+}
+
+.user-menu .ant-menu-submenu-title:hover,
+.user-menu .ant-menu-submenu-title:active,
+.user-menu .ant-menu-submenu-open > .ant-menu-submenu-title,
+.user-menu-popup .ant-menu-item:hover,
+.user-menu-popup .ant-menu-item:active,
+.user-menu-popup .ant-menu-item-selected {
+  background: transparent !important;
+  color: inherit !important;
+}

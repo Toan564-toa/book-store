@@ -291,7 +291,7 @@ export const openApiSpec = {
             schema: { type: "string", enum: Object.values(BOOK_SORT_OPTIONS) },
           },
           { in: "query", name: "page", schema: { type: "number", default: 1 } },
-          { in: "query", name: "limit", schema: { type: "number", default: 10 } },
+          { in: "query", name: "limit", schema: { type: "number", default: 8 } },
         ],
         responses: {
           [HTTP_STATUS.OK]: { description: "Book list" },

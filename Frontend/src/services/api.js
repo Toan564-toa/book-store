@@ -11,7 +11,8 @@ const api = axios.create({
 // Request interceptor - tự động gắn token nếu có
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token');
+    // debugger;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -27,6 +28,7 @@ api.interceptors.response.use(
     console.error('[API Error]', error.response?.status, error.message)
     if (error.response?.status === 401) {
       // Có thể dispatch logout hoặc redirect về /login
+      // location.href = "/login";
     }
     return Promise.reject(error)
   }

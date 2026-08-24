@@ -1,20 +1,22 @@
 import api from "./api";
 
 export const login = async (data) => {
-  return api.post(`/api/auth/login`, data);
+  return await api.post(`/api/auth/login`, data);
 }
 
 export const register = async (data) => {
-  return api.post(`/api/auth/register`, data);
+  return await api.post(`/api/auth/register`, data);
 }
 
 export const logout = async () => {
-  return api.post(`/api/auth/logout`);
+  const res = await api.post(`/api/auth/logout`);
+  localStorage.removeItem("token");
+  return res;
 }
 
 export const getMe = async () => {
-  return api.get(`/api/auth/me`);
+  return await api.get(`/api/auth/me`);
 }
 export const changePassword = async (data) => {
-  return api.patch(`/api/auth/change-password`, data);
+  return await api.patch(`/api/auth/change-password`, data);
 }

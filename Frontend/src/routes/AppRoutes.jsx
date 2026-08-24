@@ -1,12 +1,12 @@
 ﻿import { Routes, Route } from "react-router-dom";
-import Home from "../pages/Home";
-import Books from "../pages/Books";
-import BookDetail from "../pages/BookDetail";
-import About from "../pages/About";
+import Home from "../pages/Home/Home";
+import Books from "../pages/Books/Books";
+import BookDetail from "../pages/Books/BookDetail";
+import About from "../pages/About/About";
 import NotFound from "../pages/NotFound";
 import ClientLayout from "../layouts/ClientLayout";
-import Auth from "../pages/Auth";
-import Blog from "../pages/Blog";
+import Auth from "../pages/Auth/Auth";
+import Blog from "../pages/Blog/Blog";
 
 export default function AppRoutes() {
   return (
