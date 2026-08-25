@@ -2,9 +2,13 @@
 import { Link } from "react-router-dom";
 import Featuredproducts from "./components/Featuredproducts";
 import { useQuery } from "@tanstack/react-query";
-import { getAllBooks } from "../../services/bookService";
+import { getAllBooks, getBooks } from "../../services/bookService";
 
 const Home = () => {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["books"],
+    queryFn: () => getBooks({ limit: 8 }),
+  });
 
   return (
     <div>
@@ -18,13 +22,16 @@ const Home = () => {
             Lumina Books mang đến không gian đọc tinh tế, nơi bạn có thể chậm
             lại, thư giãn và đắm chìm trong những câu chuyện vượt thời gian.
           </p>
-          <Link className="rounded-md px-4 py-2 w-fit bg-[#4A654F] border-0" to={`/books`}>
+          <Link
+            className="rounded-md px-4 py-2 w-fit bg-[#4A654F] border-0"
+            to={`/books`}
+          >
             Khám phá bộ sưu tập
           </Link>
         </div>
       </div>
 
-      <Featuredproducts />
+      <Featuredproducts data={data} isLoading={isLoading} isError={isError}/>
     </div>
   );
 };

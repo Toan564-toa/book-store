@@ -25,8 +25,19 @@ export async function listBooks(req: Request, res: Response) {
     ];
   }
 
-  if (categoryId) {
-    query.categoryId = categoryId;
+  // Support one id, repeated ids (?categoryId=id1&categoryId=id2),
+  // Axios's array form (?categoryId[]=id1&categoryId[]=id2), and comma-separated ids.
+  const categoryIdValues = [categoryId, req.query["categoryId[]"]]
+    .flatMap((value) => (Array.isArray(value) ? value : [value]))
+    .filter((value): value is string => typeof value === "string")
+    .flatMap((value) => value.split(","))
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  if (categoryIdValues.length === 1) {
+    query.categoryId = categoryIdValues[0];
+  } else if (categoryIdValues.length > 1) {
+    query.categoryId = { $in: categoryIdValues };
   }
 
   if (minPrice || maxPrice) {

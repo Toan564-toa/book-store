@@ -282,7 +282,12 @@ export const openApiSpec = {
         summary: "List books with pagination",
         parameters: [
           { in: "query", name: "search", schema: { type: "string" } },
-          { in: "query", name: "categoryId", schema: { type: "string" } },
+          {
+            in: "query",
+            name: "categoryId",
+            description: "One category id, or multiple category ids. Matching books belong to any supplied category.",
+            schema: { oneOf: [{ type: "string" }, { type: "array", items: { type: "string" } }] },
+          },
           { in: "query", name: "minPrice", schema: { type: "number" } },
           { in: "query", name: "maxPrice", schema: { type: "number" } },
           {
