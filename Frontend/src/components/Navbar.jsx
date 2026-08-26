@@ -3,8 +3,9 @@ import { faCartShopping } from "@fortawesome/free-solid-svg-icons/faCartShopping
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons/faCircleUser";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
-import { Form, Menu, message } from "antd";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Form, Input, Menu, message } from "antd";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png";
 import { logout } from "../services/authService";
 
 export default function Navbar() {
@@ -17,6 +18,8 @@ export default function Navbar() {
 
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+
+  const token = localStorage.getItem("token") || "";
 
   const items = [
     {
@@ -56,11 +59,21 @@ export default function Navbar() {
     }
   };
 
+  const onSearch = (value) => {
+    const search = value.search?.trim();
+
+    if (search) {
+      navigate(`/books/search/${(search)}`);
+    }else{
+      navigate(`/books`)
+    }
+  };
+
   return (
     <header className="flex h-16 items-center justify-between border-b border-gray-200 px-5 shadow-sm">
       {contextHolder}
       <div className="flex items-center gap-6">
-        <img src="logo.png" className="h-12 w-12 object-cover" alt="logo" />
+        <img src={logo} className="h-12 w-12 object-cover" alt="logo" />
         <nav className="flex items-center gap-1">
           {nav.map(({ link, page }) => (
             <NavLink
@@ -81,30 +94,39 @@ export default function Navbar() {
         </nav>
       </div>
       <div className="flex items-center gap-4">
-        <div className="rounded-lg border px-3 py-1.5">
-          <input
-            type="text"
-            className="w-36 border-0 text-sm outline-none focus:outline-none focus:ring-0"
-            name="search"
-            id=""
-            placeholder="Tìm kiếm..."
-          />
-          <FontAwesomeIcon
-            className="text-gray-500 cursor-pointer"
-            icon={faMagnifyingGlass}
-          />
-        </div>
+          <Form onFinish={onSearch} className="flex items-center justify-center" autoComplete="off">
+            <Form.Item name="search" className="!mb-0">
+              <Input placeholder="Tìm kiếm ..." />
+          </Form.Item>
+        </Form>
         <div className="flex items-center gap-3 border-l py-1 pl-4">
           <FontAwesomeIcon className="text-xl" icon={faCartShopping} />
           {/* <FontAwesomeIcon className='text-xl' icon={faCircleUser} /> */}
-          <Menu
-            className="user-menu"
-            onClick={onClick}
-            selectable={false}
-            mode="vertical"
-            expandIcon={null}
-            items={items}
-          />
+          {token ? (
+            <Menu
+              className="user-menu"
+              onClick={onClick}
+              selectable={false}
+              mode="vertical"
+              expandIcon={null}
+              items={items}
+            />
+          ) : (
+            <div className="flex gap-1">
+              <Link
+                to={`/register`}
+                className="px-2 py-1 bg-black text-white rounded-sm hover:bg-gray-500 transition"
+              >
+                Đăng ký
+              </Link>
+              <Link
+                to={`/login`}
+                className="px-2 py-1 bg-black text-white rounded-sm hover:bg-gray-500 transition"
+              >
+                Đăng nhập
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>

@@ -1,63 +1,24 @@
-﻿import { useQuery } from "@tanstack/react-query";
-import { Checkbox, InputNumber, Pagination, Select } from "antd";
-import React, { useState } from "react";
-import { getBooks } from "../../services/bookService";
+﻿import { Checkbox, InputNumber, Pagination, Select } from "antd";
 import CardBook from "../../components/CardBook";
 import SkeletonCard from "../../components/skeleton/SkeletonCard";
-import { getCategoryAll } from "../../services/categoryService";
-import { formatVND, parseVND } from "../../components/format/Format";
+import useBooks from "../../hooks/useBooks";
 
 const Books = () => {
-  const onSecondCityChange = (value) => {
-    setSecondCity(value);
-  };
-
-  const [page, setPage] = useState(1);
-  const [selectedCategoryIds ,setSelectedCategoryIds] = useState("")
-  const limit = 8;
-
-  const sort = [
-    { name: "Mới nhất", sort: "newest" },
-    { name: "Giá tăng dần", sort: "price_asc" },
-    { name: "Giá giảm dần", sort: "price_desc" },
-    { name: "Bán chạy nhất", sort: "best_selling" },
-  ];
-
+  
   const {
-    data: booksData = [],
-    isLoading: isBooksLoading,
-    isError: isBooksError,
-  } = useQuery({
-    queryKey: ["books", { page, limit, selectedCategoryIds }],
-    queryFn: () => getBooks({ limit: limit, page: page, categoryId: selectedCategoryIds.join(","), }),
-  });
-
-  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
-    queryKey: ["categories"],
-    queryFn: () => getCategoryAll(),
-  });
-
-  console.log("booksData: ", booksData);
-  //   {
-  //     "page": 1,
-  //     "limit": 8,
-  //     "total": 17,
-  //     "totalPages": 3
-  // }
-
-  const onChange = (checkedValues) => {
-    // console.log("checked = ", checkedValues);
-    setSelectedCategoryIds(checkedValues);
-    setPage(1);
-  };
-
-  const minPriceChange = (value) => {
-    console.log("min: ", value);
-  };
-
-  const maxPriceChange = (value) => {
-    console.log("max: ", value);
-  };
+    booksData,
+    categories,
+    isBooksError,
+    isBooksLoading,
+    isCategoriesLoading,
+    maxPriceChange,
+    minPriceChange,
+    onChange,
+    sortChange,
+    sortData,
+    page,
+    setPage
+  } = useBooks();
 
   return (
     <div className="flex">
@@ -70,7 +31,7 @@ const Books = () => {
               label: category.name,
               value: category.id,
             }))}
-            className="flex gap-2.5"
+            className="flex flex-col gap-2.5"
             onChange={onChange}
           />
         </div>
@@ -78,10 +39,9 @@ const Books = () => {
           <h3 className="text-xl font-bold">Khoảng giá</h3>
           <div className="flex gap-0.5">
             <InputNumber
-              defaultValue="1"
+              defaultValue="0"
               min="0"
               max="1000000"
-              formatter={formatVND}
               onChange={minPriceChange}
               stringMode
             />
@@ -90,7 +50,6 @@ const Books = () => {
               defaultValue="1000000"
               min="0"
               max="1000000"
-              formatter={formatVND}
               onChange={maxPriceChange}
               stringMode
             />
@@ -104,8 +63,8 @@ const Books = () => {
           <Select
             defaultValue="Bộ lọc"
             style={{ width: 120 }}
-            onChange={onSecondCityChange}
-            options={sort.map((i) => ({
+            onChange={sortChange}
+            options={sortData.map((i) => ({
               label: i.name,
               value: i.sort,
             }))}

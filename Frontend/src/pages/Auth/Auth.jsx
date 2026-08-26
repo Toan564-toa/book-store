@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm";
 import { login, register } from "../../services/authService";
 import { Form, message } from "antd";
+import loginImage from "../../assets/Login.jpg";
 
 const Auth = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -63,7 +64,7 @@ const Auth = () => {
       {contextHolder}
       <div className="w-1/2 h-screen">
         <img
-          src="Login.jpg"
+          src={loginImage}
           className="min-h-screen object-cover"
           alt="login"
         />

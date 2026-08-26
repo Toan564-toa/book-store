@@ -16,6 +16,7 @@ export default function AppRoutes() {
       <Route path="/" element={<ClientLayout />}>
         <Route path="" element={<Home />} />
         <Route path="books" element={<Books />} />
+        <Route path="books/search/:search" element={<Books />} />
         <Route path="books/:id" element={<BookDetail />} />
         <Route path="about" element={<About />} />
         <Route path="blog" element={<Blog />} />

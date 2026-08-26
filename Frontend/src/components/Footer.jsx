@@ -1,10 +1,11 @@
 import React from "react";
+import logo from "../assets/logo.png";
 
 const Footer = () => {
   return (
     <div className=" flex flex-wrap justify-center p-4 bg-gray-200 text-gray-700">
       <div className="column-1 w-1/3 p-4 flex flex-col justify-center items-start gap-5">
-        <img src="logo.png" alt="Logo" className="w-14 h-14 object-cover" />
+        <img src={logo} alt="Logo" className="w-14 h-14 object-cover" />
         <p className="text-gray-700">
           © 2024 Lumina Books. Tất cả quyền được bảo lưu. Một trải nghiệm đọc
           tinh tế.

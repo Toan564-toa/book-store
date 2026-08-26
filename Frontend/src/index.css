@@ -5,7 +5,7 @@ body {
 }
 
 .banner{
-  background-image: url(Banner.png);
+  background-image: url("./assets/Banner.png");
 }
 
 .user-menu,
