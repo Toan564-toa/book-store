@@ -4,9 +4,12 @@ import { faCircleUser } from "@fortawesome/free-solid-svg-icons/faCircleUser";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
 import { Form, Input, Menu, message } from "antd";
+import { useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../assets/logo.png";
 import { logout } from "../services/authService";
+import { clearCartState, fetchCart } from "../stores/cartSlice";
 
 export default function Navbar() {
   const nav = [
@@ -18,8 +21,18 @@ export default function Navbar() {
 
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
+  const dispatch = useDispatch();
+  const cartItemCount = useSelector((state) => state.cart.version);
 
   const token = localStorage.getItem("token") || "";
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchCart());
+    } else {
+      dispatch(clearCartState());
+    }
+  }, [dispatch, token]);
 
   const items = [
     {
@@ -41,7 +54,9 @@ export default function Navbar() {
         type: "success",
         content: "Đăng xuất thành công!",
       });
-      navigate(`/login`);
+      localStorage.removeItem("token");
+      dispatch(clearCartState());
+      // navigate(`/login`);
     },
     onError: () => {
       messageApi.open({
@@ -52,16 +67,13 @@ export default function Navbar() {
   });
 
   const onClick = (e) => {
-    console.log("click", e);
     if (e.key === "2") {
-      // debugger;
       logoutMutaion.mutate();
     }
   };
 
   const onSearch = (value) => {
     const search = value.search?.trim();
-
     if (search) {
       navigate(`/books/search/${(search)}`);
     }else{
@@ -100,7 +112,14 @@ export default function Navbar() {
           </Form.Item>
         </Form>
         <div className="flex items-center gap-3 border-l py-1 pl-4">
-          <FontAwesomeIcon className="text-xl" icon={faCartShopping} />
+          <Link to="/cart" className="relative" aria-label="Giỏ hàng">
+            <FontAwesomeIcon className="text-xl" icon={faCartShopping} />
+            {cartItemCount > 0 && (
+              <span className="absolute -right-3 -top-3 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs text-white">
+                {cartItemCount}
+              </span>
+            )}
+          </Link>
           {/* <FontAwesomeIcon className='text-xl' icon={faCircleUser} /> */}
           {token ? (
             <Menu

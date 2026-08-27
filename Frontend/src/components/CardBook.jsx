@@ -29,14 +29,14 @@ const CardBook = ({ book }) => {
         <p className="mt-1 text-[10px] text-[#565b54]">{book.author}</p>
         <div className="mt-auto flex items-center justify-between pt-3">
           <span>
+            <span className="text-[18px] font-medium text-red-600">
+              {formatVND(book.discountPrice)}
+            </span>
             <span
-              className="text-[11px] font-medium text-[#294b36]"
+              className="text-[11px] font-medium text-[#294b36]  ml-2.5"
               style={{ textDecoration: "line-through" }}
             >
               {formatVND(book.price)}
-            </span>
-            <span className="text-[20px] font-medium text-red-600 ml-2.5">
-              {formatVND(book.discountPrice)}
             </span>
           </span>
           <button

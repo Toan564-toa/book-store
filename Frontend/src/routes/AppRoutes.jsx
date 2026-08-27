@@ -7,6 +7,7 @@ import NotFound from "../pages/NotFound";
 import ClientLayout from "../layouts/ClientLayout";
 import Auth from "../pages/Auth/Auth";
 import Blog from "../pages/Blog/Blog";
+import Cart from "../pages/Cart/Cart";
 
 export default function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export default function AppRoutes() {
         <Route path="books/:id" element={<BookDetail />} />
         <Route path="about" element={<About />} />
         <Route path="blog" element={<Blog />} />
+        <Route path="cart" element={<Cart />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm";
 import { login, register } from "../../services/authService";
 import { Form, message } from "antd";
@@ -9,6 +9,7 @@ const Auth = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const nav = useNavigate();
+  const location = useLocation();
 
   const loginMutation = useMutation({
     mutationFn: (data) => {
@@ -27,7 +28,11 @@ const Auth = () => {
           type: "success",
           content: "Đăng nhập thành công!",
         });
-        return nav(`/`);
+        const previousPath = location.state?.from;
+        if (previousPath === "/register" || window.history.length <= 1) {
+          return nav("/", { replace: true });
+        }
+        return nav(-1);
       }
       if (location.pathname === "/register") {
         form.resetFields();
@@ -35,7 +40,7 @@ const Auth = () => {
           type: "success",
           content: "Đăng ký thành công!",
         });
-        return nav(`/login`);
+        return nav(`/login`, { state: { from: "/register" } });
       }
     },
     onError: (error) => {
@@ -82,6 +87,7 @@ const Auth = () => {
             <Link
               className={`text-center w-full px-0 py-2 border-b-2 ${location.pathname === "/login" ? "border-blue-500" : "border-gray-300"} font-semibold`}
               to="/login"
+              state={{ from: location.pathname }}
             >
               Đăng nhập
             </Link>
