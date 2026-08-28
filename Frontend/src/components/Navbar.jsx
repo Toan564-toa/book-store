@@ -1,5 +1,4 @@
-﻿import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { faCartShopping } from "@fortawesome/free-solid-svg-icons/faCartShopping";
+﻿import { faCartShopping } from "@fortawesome/free-solid-svg-icons/faCartShopping";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons/faCircleUser";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
@@ -7,6 +6,7 @@ import { Form, Input, Menu, message } from "antd";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { logout } from "../services/authService";
+import { useCart } from "../hooks/useCart";
 
 export default function Navbar() {
   const nav = [
@@ -18,8 +18,8 @@ export default function Navbar() {
 
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
-
   const token = localStorage.getItem("token") || "";
+  const { quantityBook } = useCart();
 
   const items = [
     {
@@ -61,11 +61,10 @@ export default function Navbar() {
 
   const onSearch = (value) => {
     const search = value.search?.trim();
-
     if (search) {
-      navigate(`/books/search/${(search)}`);
-    }else{
-      navigate(`/books`)
+      navigate(`/books/search/${search}`);
+    } else {
+      navigate(`/books`);
     }
   };
 
@@ -94,13 +93,24 @@ export default function Navbar() {
         </nav>
       </div>
       <div className="flex items-center gap-4">
-          <Form onFinish={onSearch} className="flex items-center justify-center" autoComplete="off">
-            <Form.Item name="search" className="!mb-0">
-              <Input placeholder="Tìm kiếm ..." />
+        <Form
+          onFinish={onSearch}
+          className="flex items-center justify-center"
+          autoComplete="off"
+        >
+          <Form.Item name="search" className="!mb-0">
+            <Input placeholder="Tìm kiếm ..." />
           </Form.Item>
         </Form>
         <div className="flex items-center gap-3 border-l py-1 pl-4">
-          <FontAwesomeIcon className="text-xl" icon={faCartShopping} />
+          <Link to="/cart" className="relative" aria-label="Giỏ hàng">
+            <FontAwesomeIcon className="text-xl" icon={faCartShopping} />
+            {quantityBook > 0 && (
+              <span className="absolute -right-3 -top-3 flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs text-white">
+                {quantityBook}
+              </span>
+            )}
+          </Link>
           {/* <FontAwesomeIcon className='text-xl' icon={faCircleUser} /> */}
           {token ? (
             <Menu

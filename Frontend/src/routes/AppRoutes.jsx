@@ -7,6 +7,7 @@ import NotFound from "../pages/NotFound";
 import ClientLayout from "../layouts/ClientLayout";
 import Auth from "../pages/Auth/Auth";
 import Blog from "../pages/Blog/Blog";
+import Cart from "../pages/Cart/Cart";
 
 export default function AppRoutes() {
   return (
@@ -16,6 +17,7 @@ export default function AppRoutes() {
       <Route path="/" element={<ClientLayout />}>
         <Route path="" element={<Home />} />
         <Route path="books" element={<Books />} />
+        <Route path="cart" element={<Cart />} />
         <Route path="books/search/:search" element={<Books />} />
         <Route path="books/:id" element={<BookDetail />} />
         <Route path="about" element={<About />} />

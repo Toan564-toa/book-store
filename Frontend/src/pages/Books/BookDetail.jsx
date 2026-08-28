@@ -6,36 +6,38 @@
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React, { useState } from "react";
+import { Image, Modal, Skeleton } from "antd";
 import { formatVND } from "../../components/format/Format";
 import useBookDetail from "../../hooks/useBookDetail";
 
-const fakeBook = {
-  title: "Nghệ thuật sống tối giản",
-  author: "Phạm Hoàng Ngân",
-  price: 220000,
-  discountPrice: 185000,
-  imageUrl:
-    "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=900&q=85",
-  pages: "256 trang",
-  publisher: "NXB Trẻ",
-  size: "14 x 20.5 cm",
-  cover: "Bìa mềm",
-  rating: 4.8,
-  reviewCount: 124,
-  description: [
-    "Nghệ thuật sống tối giản không chỉ là việc vứt bỏ đồ đạc, mà là quá trình thanh lọc tâm trí, tập trung vào những điều thực sự mang lại ý nghĩa và hạnh phúc trong cuộc sống hiện đại.",
-    "Cuốn sách đưa ra những góc nhìn sâu sắc và bài thực hành cụ thể giúp người đọc dần buông bỏ những áp lực vô hình, sắp xếp lại không gian sống và tìm lại sự bình yên nội tại.",
-  ],
-};
-
 const fakeReviews = [
-  { name: "Minh Anh", date: "2 ngày trước", text: "Một cuốn sách tuyệt vời để cân bằng lại cuộc sống. Ngôn từ mộc mạc nhưng sâu sắc." },
-  { name: "Tuấn Phong", date: "1 tuần trước", text: "Đọc chậm rãi vào buổi sáng cùng một tách trà hợp nhất. Sách đẹp và nội dung dễ áp dụng." },
+  {
+    name: "Minh Anh",
+    date: "2 ngày trước",
+    text: "Một cuốn sách tuyệt vời để cân bằng lại cuộc sống. Ngôn từ mộc mạc nhưng sâu sắc.",
+  },
+  {
+    name: "Tuấn Phong",
+    date: "1 tuần trước",
+    text: "Đọc chậm rãi vào buổi sáng cùng một tách trà hợp nhất. Sách đẹp và nội dung dễ áp dụng.",
+  },
 ];
 
 const BookDetail = () => {
-  const { } = useBookDetail();
+  const {
+    quantity,
+    setQuantity,
+    contextHolder,
+    isModalOpen,
+    isFavorite,
+    data,
+    isLoading,
+    isError,
+    handleOk,
+    handleCancel,
+    handleToCart,
+    handleFav,
+  } = useBookDetail();
 
   return (
     <main className="text-[#334b3b] sm:px-8 lg:px-12 py-2.5">
@@ -207,4 +209,4 @@ const BookDetail = () => {
   );
 };
 
-export default BookDetail
+export default BookDetail;

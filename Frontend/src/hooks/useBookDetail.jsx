@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { message } from "antd";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getBookById } from "../services/bookService";
+import { useCart } from "./useCart";
 
 const useBookDetail = () => {
   const [quantity, setQuantity] = useState(1);
@@ -11,11 +13,15 @@ const useBookDetail = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const {addMutation} = useCart();
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["booksDetail", { id }],
     queryFn: () => getBookById(id),
   });
+
+  console.log("id: ", id);
+  console.log("data: ", data);
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -26,12 +32,19 @@ const useBookDetail = () => {
     setIsModalOpen(false);
   };
 
-  const handleToCart = () => {
+  const handleToCart = async () => {
     if (!token) {
-      setIsModalOpen(true);
-      return;
+        setIsModalOpen(true);
+        return;
     }
-    
+    await addMutation.mutateAsync({
+      bookId: id,
+      quantity,
+    });
+    messageApi.open({
+        type:"success",
+        content: "Thêm vào giỏ hàng thành công!"
+    })
   };
 
   const handleFav = () => {
