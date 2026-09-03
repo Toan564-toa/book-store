@@ -20,9 +20,6 @@ const useBookDetail = () => {
     queryFn: () => getBookById(id),
   });
 
-  console.log("id: ", id);
-  console.log("data: ", data);
-
   const handleOk = () => {
     setIsModalOpen(false);
     navigate(`/login`);

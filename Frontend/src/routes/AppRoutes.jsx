@@ -8,6 +8,18 @@ import ClientLayout from "../layouts/ClientLayout";
 import Auth from "../pages/Auth/Auth";
 import Blog from "../pages/Blog/Blog";
 import Cart from "../pages/Cart/Cart";
+import Checkout from "../pages/Checkout/Checkout";
+import Orders from "../pages/Orders/Orders";
+import OrderDetail from "../pages/Orders/OrderDetail";
+import Profile from "../pages/Profile/Profile";
+import Wishlist from "../pages/Wishlist/Wishlist";
+import AdminLayout from "../layouts/AdminLayout";
+import Dashboard from "../pages/Admin/Dashboard";
+import AdminBooks from "../pages/Admin/Books";
+import AdminCategories from "../pages/Admin/Categories";
+import AdminOrders from "../pages/Admin/Orders";
+import AdminUsers from "../pages/Admin/Users";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export default function AppRoutes() {
   return (
@@ -18,11 +30,47 @@ export default function AppRoutes() {
         <Route path="" element={<Home />} />
         <Route path="books" element={<Books />} />
         <Route path="cart" element={<Cart />} />
+        <Route path="checkout" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
         <Route path="books/search/:search" element={<Books />} />
         <Route path="books/:id" element={<BookDetail />} />
         <Route path="about" element={<About />} />
         <Route path="blog" element={<Blog />} />
+        <Route path="profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="orders" element={
+          <ProtectedRoute>
+            <Orders />
+          </ProtectedRoute>
+        } />
+        <Route path="orders/:id" element={
+          <ProtectedRoute>
+            <OrderDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="wishlist" element={
+          <ProtectedRoute>
+            <Wishlist />
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<NotFound />} />
+      </Route>
+      <Route path="/admin" element={
+        <ProtectedRoute adminOnly>
+          <AdminLayout />
+        </ProtectedRoute>
+      }>
+        <Route path="" element={<Dashboard />} />
+        <Route path="books" element={<AdminBooks />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="orders" element={<AdminOrders />} />
+        <Route path="users" element={<AdminUsers />} />
       </Route>
     </Routes>
   );

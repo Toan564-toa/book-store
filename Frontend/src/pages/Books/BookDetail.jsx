@@ -7,21 +7,11 @@
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Image, Modal, Skeleton } from "antd";
+import { useQuery } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 import { formatVND } from "../../components/format/Format";
 import useBookDetail from "../../hooks/useBookDetail";
-
-const fakeReviews = [
-  {
-    name: "Minh Anh",
-    date: "2 ngày trước",
-    text: "Một cuốn sách tuyệt vời để cân bằng lại cuộc sống. Ngôn từ mộc mạc nhưng sâu sắc.",
-  },
-  {
-    name: "Tuấn Phong",
-    date: "1 tuần trước",
-    text: "Đọc chậm rãi vào buổi sáng cùng một tách trà hợp nhất. Sách đẹp và nội dung dễ áp dụng.",
-  },
-];
+import { getAllBookReviews } from "../../services/reviewService";
 
 const BookDetail = () => {
   const {
@@ -38,6 +28,24 @@ const BookDetail = () => {
     handleToCart,
     handleFav,
   } = useBookDetail();
+
+  const { id } = useParams();
+
+  const { data: reviewsData, isLoading: isReviewsLoading } = useQuery({
+    queryKey: ["bookReviews", id],
+    queryFn: () => getAllBookReviews(id),
+    enabled: Boolean(id),
+  });
+
+  const reviews = reviewsData?.reviews ?? [];
+
+  const discountPercent =
+    data?.book?.discountPrice && data?.book?.price
+      ? Math.round(
+          ((data.book.price - data.book.discountPrice) / data.book.price) *
+            100,
+        )
+      : 0;
 
   return (
     <main className="text-[#334b3b] sm:px-8 lg:px-12 py-2.5">
@@ -82,9 +90,11 @@ const BookDetail = () => {
               <span className="text-sm text-[#a6aaa0] line-through">
                 {formatVND(data?.book?.price)}
               </span>
-              <span className="rounded bg-[#e5eee4] px-2 py-1 text-xs font-medium text-[#416044]">
-                -16%
-              </span>
+              {discountPercent > 0 && (
+                <span className="rounded bg-[#e5eee4] px-2 py-1 text-xs font-medium text-[#416044]">
+                  -{discountPercent}%
+                </span>
+              )}
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-x-8 gap-y-5 rounded-lg bg-[#f1f0e8] p-5 text-sm">
@@ -183,26 +193,39 @@ const BookDetail = () => {
             </span>
           </div>
           <div className="mt-5 divide-y divide-[#e1e1d7]">
-            {fakeReviews.map((review) => (
-              <article key={review.name} className="py-4 first:pt-0 last:pb-0">
-                <div className="flex justify-between text-xs font-medium text-[#39433a]">
-                  <span>{review.name}</span>
-                  <span className="font-normal text-[#a1a79d]">
-                    {review.date}
-                  </span>
-                </div>
-                <p className="mt-2 text-xs leading-5 text-[#687166]">
-                  {review.text}
-                </p>
-              </article>
-            ))}
+            {isReviewsLoading ? (
+              <p className="py-4 text-xs text-gray-500">Đang tải nhận xét...</p>
+            ) : reviews.length === 0 ? (
+              <p className="py-4 text-xs text-gray-500">Chưa có nhận xét nào.</p>
+            ) : (
+              reviews.map((review) => (
+                <article key={review._id} className="py-4 first:pt-0 last:pb-0">
+                  <div className="flex justify-between text-xs font-medium text-[#39433a]">
+                    <span>{review.userId?.name || "Người dùng"}</span>
+                    <span className="font-normal text-[#a1a79d]">
+                      {new Date(review.createdAt).toLocaleDateString("vi-VN")}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-xs text-[#31563d]">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <FontAwesomeIcon
+                        key={star}
+                        icon={faStar}
+                        className={
+                          star > Number(review.rating) ? "text-[#c8cec2]" : ""
+                        }
+                      />
+                    ))}
+                  </div>
+                  {review.comment && (
+                    <p className="mt-2 text-xs leading-5 text-[#687166]">
+                      {review.comment}
+                    </p>
+                  )}
+                </article>
+              ))
+            )}
           </div>
-          <button
-            type="button"
-            className="mt-5 w-full text-xs font-medium text-[#31563d] hover:underline"
-          >
-            Xem tất cả nhận xét
-          </button>
         </aside>
       </section>
     </main>

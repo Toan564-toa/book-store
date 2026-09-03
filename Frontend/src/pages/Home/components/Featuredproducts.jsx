@@ -1,10 +1,10 @@
-import { faArrowRight, faCartPlus } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link } from "react-router-dom";
 import SkeletonCard from "../../../components/skeleton/SkeletonCard";
 import CardBook from "../../../components/CardBook";
 
-const Featuredproducts = ({ data, isLoading, isError}) => {
+const Featuredproducts = ({ data, isLoading, isError }) => {
 
   return (
     <section className="bg-[#faf9f2] px-5 py-12 sm:px-8 md:py-16 lg:px-11">
@@ -30,11 +30,11 @@ const Featuredproducts = ({ data, isLoading, isError}) => {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {isLoading
             ? Array.from({ length: 4 }).map((_, index) => (
-                <SkeletonCard index={index}/>
+                <SkeletonCard key={index} index={index} />
               ))
             : data?.books?.map((book) => (
-            <CardBook key={book.id} book={book} />
-          ))}
+              <CardBook key={book.id} book={book} />
+            ))}
           {isError && (
             <h2>Lỗi máy chủ, vui lòng quay lại sau</h2>
           )}

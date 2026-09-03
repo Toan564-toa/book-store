@@ -1,7 +1,10 @@
 import { Button, Form, Input } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const AuthForm = ({ onFinish, form, loading }) => {
+  const location = useLocation();
+  const isLogin = location.pathname === "/login";
+
   return (
     <Form
       form={form}
@@ -10,10 +13,9 @@ const AuthForm = ({ onFinish, form, loading }) => {
       className="w-full"
       initialValues={{ remember: true }}
       onFinish={onFinish}
-      // onFinishFailed={onFinishFailed}
       autoComplete="off"
     >
-      {location.pathname === "/register" && (
+      {!isLogin && (
         <Form.Item
           label="Tên người dùng"
           name="name"
@@ -42,8 +44,7 @@ const AuthForm = ({ onFinish, form, loading }) => {
 
       <Form.Item
         label={
-          location.pathname === "/login" ? (
-            //không để được w-full
+          isLogin ? (
             <div className="flex w-lg items-center justify-between">
               <span>Mật khẩu</span>
               <Link to="/forgot-password">Quên mật khẩu?</Link>
@@ -58,7 +59,7 @@ const AuthForm = ({ onFinish, form, loading }) => {
         <Input.Password />
       </Form.Item>
 
-      {location.pathname === "/register" && (
+      {!isLogin && (
         <Form.Item
           label="Xác nhận mật khẩu"
           name="confirmPassword"
@@ -83,7 +84,7 @@ const AuthForm = ({ onFinish, form, loading }) => {
 
       <Form.Item label={null}>
         <Button loading={loading} type="primary" htmlType="submit" className={`w-full`}>
-          {location.pathname === "/login" ? "Đăng nhập" : "Đăng ký"}
+          {isLogin ? "Đăng nhập" : "Đăng ký"}
         </Button>
       </Form.Item>
     </Form>

@@ -28,7 +28,9 @@ export default function Navbar() {
       popupClassName: "user-menu-popup",
       children: [
         { key: "1", label: "Thông tin tài khoản" },
-        { key: "2", label: "Đăng xuất" },
+        { key: "2", label: "Đơn hàng của tôi" },
+        { key: "3", label: "Danh sách yêu thích" },
+        { key: "4", label: "Đăng xuất" },
       ],
     },
   ];
@@ -52,9 +54,13 @@ export default function Navbar() {
   });
 
   const onClick = (e) => {
-    console.log("click", e);
-    if (e.key === "2") {
-      // debugger;
+    if (e.key === "1") {
+      navigate("/profile");
+    } else if (e.key === "2") {
+      navigate("/orders");
+    } else if (e.key === "3") {
+      navigate("/wishlist");
+    } else if (e.key === "4") {
       logoutMutaion.mutate();
     }
   };
@@ -111,7 +117,6 @@ export default function Navbar() {
               </span>
             )}
           </Link>
-          {/* <FontAwesomeIcon className='text-xl' icon={faCircleUser} /> */}
           {token ? (
             <Menu
               className="user-menu"

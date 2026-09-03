@@ -22,8 +22,8 @@ export const createBooks = async (data) => {
   return await api.post(`/api/books/`, data);
 };
 
-export const updateBooks = async (id) => {
-  return await api.patch(`/api/books/${id}`);
+export const updateBooks = async (id, data) => {
+  return await api.patch(`/api/books/${id}`, data);
 };
 
 export const deleteBooks = async (id) => {
