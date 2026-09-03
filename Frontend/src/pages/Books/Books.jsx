@@ -10,7 +10,6 @@ const Books = () => {
     categories,
     isBooksError,
     isBooksLoading,
-    isCategoriesLoading,
     maxPriceChange,
     minPriceChange,
     onChange,

@@ -1,13 +1,13 @@
 import { faMinus, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { message, Skeleton } from "antd";
+import { Button, message, Skeleton } from "antd";
+import { Link } from "react-router-dom";
 import { formatVND } from "../../components/format/Format";
 import { useCart } from "../../hooks/useCart";
 
 const Cart = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const {
-    cart,
     isError,
     isLoading,
     items,
@@ -31,6 +31,8 @@ const Cart = () => {
   if (isLoading && items.length === 0) {
     return <Skeleton active className="p-6" />;
   }
+
+  const total = items.reduce((sum, item) => sum + (item.subtotal || 0), 0);
 
   return (
     <main className="px-5 py-8 text-[#334b3b] sm:px-8 lg:px-12">
@@ -102,8 +104,17 @@ const Cart = () => {
             <h2 className="text-lg font-semibold">Tóm tắt đơn hàng</h2>
             <div className="mt-4 flex justify-between border-t border-[#dcdccf] pt-4">
               <span>Tạm tính</span>
-              <strong>{formatVND(cart?.total)}</strong>
+              <strong>{formatVND(total)}</strong>
             </div>
+            <Link to="/checkout">
+              <Button
+                type="primary"
+                className="mt-4 w-full"
+                style={{ backgroundColor: "#31563d", borderColor: "#31563d" }}
+              >
+                Thanh toán
+              </Button>
+            </Link>
           </aside>
         </div>
       )}

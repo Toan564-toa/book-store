@@ -12,7 +12,6 @@ const useBooks = () => {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
   const limit = 8;
   const {search} = useParams();
-  console.log("search: ", search);
 
   const sortData = [
     { name: "Mới nhất", sort: "newest" },
@@ -48,23 +47,19 @@ const useBooks = () => {
   });
 
   const onChange = (checkedValues) => {
-    // console.log("checked = ", checkedValues);
     setSelectedCategoryIds(checkedValues);
     setPage(1);
   };
 
   const minPriceChange = (value) => {
-    console.log("min: ", value);
     setMinPrice(value);
   };
 
   const sortChange = (value) => {
-    console.log(value);
     setSort(value);
   };
 
   const maxPriceChange = (value) => {
-    console.log("max: ", value);
     setMaxPrice(value);
   };
 

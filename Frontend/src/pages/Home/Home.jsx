@@ -1,8 +1,7 @@
-﻿import React from "react";
+﻿import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import Featuredproducts from "./components/Featuredproducts";
-import { useQuery } from "@tanstack/react-query";
-import { getAllBooks, getBooks } from "../../services/bookService";
+import { getBooks } from "../../services/bookService";
 
 const Home = () => {
   const { data, isLoading, isError } = useQuery({

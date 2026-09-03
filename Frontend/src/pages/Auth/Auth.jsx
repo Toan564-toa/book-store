@@ -1,27 +1,39 @@
 import { useMutation } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm";
 import { login, register } from "../../services/authService";
 import { Form, message } from "antd";
 import loginImage from "../../assets/Login.jpg";
+import { useAuth } from "../../context/AuthContext";
+import { getMe } from "../../services/userService";
 
 const Auth = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const nav = useNavigate();
+  const location = useLocation();
+  const { login: setAuthLogin } = useAuth();
+
+  const isLogin = location.pathname === "/login";
 
   const loginMutation = useMutation({
     mutationFn: (data) => {
-      if (location.pathname === "/login") {
-        return login(data);
-      }
-      if (location.pathname === "/register") {
-        return register(data);
-      }
+      return isLogin ? login(data) : register(data);
     },
-    onSuccess: (data) => {
-      if (location.pathname === "/login") {
-        localStorage.setItem("token", data.token);
+    onSuccess: async (data) => {
+      if (isLogin) {
+        let userObj = data.user;
+        if (!userObj) {
+          try {
+            const res = await getMe();
+            userObj = res?.user;
+          } catch {
+            userObj = null;
+          }
+        }
+        if (data.token) {
+          setAuthLogin(data.token, userObj);
+        }
         form.resetFields();
         messageApi.open({
           type: "success",
@@ -29,24 +41,21 @@ const Auth = () => {
         });
         return nav(`/`);
       }
-      if (location.pathname === "/register") {
-        form.resetFields();
-        messageApi.open({
-          type: "success",
-          content: "Đăng ký thành công!",
-        });
-        return nav(`/login`);
-      }
+      form.resetFields();
+      messageApi.open({
+        type: "success",
+        content: "Đăng ký thành công!",
+      });
+      return nav(`/login`);
     },
     onError: (error) => {
       console.error("Login failed:", error);
-      if (location.pathname === "/login") {
+      if (isLogin) {
         messageApi.open({
           type: "error",
           content: "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.",
         });
-      }
-      if(location.pathname === "/register"){
+      } else {
         messageApi.open({
           type: "error",
           content: "Đăng ký thất bại. Email đã tồn tại!",
@@ -80,13 +89,13 @@ const Auth = () => {
         <div className="px-20 w-full">
           <div className="flex justify-between items-center my-5">
             <Link
-              className={`text-center w-full px-0 py-2 border-b-2 ${location.pathname === "/login" ? "border-blue-500" : "border-gray-300"} font-semibold`}
+              className={`text-center w-full px-0 py-2 border-b-2 ${isLogin ? "border-blue-500" : "border-gray-300"} font-semibold`}
               to="/login"
             >
               Đăng nhập
             </Link>
             <Link
-              className={`text-center w-full px-0 py-2 border-b-2 ${location.pathname === "/register" ? "border-blue-500" : "border-gray-300"} font-semibold`}
+              className={`text-center w-full px-0 py-2 border-b-2 ${!isLogin ? "border-blue-500" : "border-gray-300"} font-semibold`}
               to="/register"
             >
               Đăng ký

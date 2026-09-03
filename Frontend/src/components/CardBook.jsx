@@ -1,10 +1,30 @@
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons/faCartPlus";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { message } from "antd";
+import { useAuth } from "../context/AuthContext";
 import { formatVND } from "./format/Format";
+import { addCart } from "../services/cartService";
 
 const CardBook = ({ book }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      message.warning("Vui lòng đăng nhập để thêm vào giỏ hàng!");
+      navigate("/login");
+      return;
+    }
+    try {
+      await addCart({ bookId: book.id, quantity: 1 });
+      message.success("Đã thêm vào giỏ hàng!");
+    } catch {
+      message.error("Thêm vào giỏ hàng thất bại!");
+    }
+  };
+
   return (
     <article
       key={book.id}
@@ -42,6 +62,7 @@ const CardBook = ({ book }) => {
           <button
             type="button"
             aria-label={`Thêm ${book.title} vào giỏ hàng`}
+            onClick={handleAddToCart}
             className="text-[#2d513a] transition-colors hover:text-[#6a8a5d]"
           >
             <FontAwesomeIcon icon={faCartPlus} className="text-sm" />

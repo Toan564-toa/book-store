@@ -1,5 +1,6 @@
 ﻿import { faCartShopping } from "@fortawesome/free-solid-svg-icons/faCartShopping";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons/faCircleUser";
+import { faGauge } from "@fortawesome/free-solid-svg-icons/faGauge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
 import { Form, Input, Menu, message } from "antd";
@@ -7,6 +8,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { logout } from "../services/authService";
 import { useCart } from "../hooks/useCart";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const nav = [
@@ -18,8 +20,8 @@ export default function Navbar() {
 
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
-  const token = localStorage.getItem("token") || "";
   const { quantityBook } = useCart();
+  const { isAdmin, user, logout: authLogout } = useAuth();
 
   const items = [
     {
@@ -28,7 +30,9 @@ export default function Navbar() {
       popupClassName: "user-menu-popup",
       children: [
         { key: "1", label: "Thông tin tài khoản" },
-        { key: "2", label: "Đăng xuất" },
+        { key: "2", label: "Đơn hàng của tôi" },
+        { key: "3", label: "Danh sách yêu thích" },
+        { key: "4", label: "Đăng xuất" },
       ],
     },
   ];
@@ -37,6 +41,7 @@ export default function Navbar() {
     mutationKey: "logout",
     mutationFn: () => logout(),
     onSuccess: () => {
+      authLogout();
       messageApi.open({
         type: "success",
         content: "Đăng xuất thành công!",
@@ -52,9 +57,13 @@ export default function Navbar() {
   });
 
   const onClick = (e) => {
-    console.log("click", e);
-    if (e.key === "2") {
-      // debugger;
+    if (e.key === "1") {
+      navigate("/profile");
+    } else if (e.key === "2") {
+      navigate("/profile/orders");
+    } else if (e.key === "3") {
+      navigate("/profile/wishlist");
+    } else if (e.key === "4") {
       logoutMutaion.mutate();
     }
   };
@@ -103,6 +112,22 @@ export default function Navbar() {
           </Form.Item>
         </Form>
         <div className="flex items-center gap-3 border-l py-1 pl-4">
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              className={({ isActive }) =>
+                `flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
+                  isActive
+                    ? "bg-[#31563d] text-white"
+                    : "bg-[#e5eee4] text-[#31563d] hover:bg-[#cfd9c8]"
+                }`
+              }
+              aria-label="Trang quản trị"
+            >
+              <FontAwesomeIcon icon={faGauge} />
+              <span>Quản trị</span>
+            </NavLink>
+          )}
           <Link to="/cart" className="relative" aria-label="Giỏ hàng">
             <FontAwesomeIcon className="text-xl" icon={faCartShopping} />
             {quantityBook > 0 && (
@@ -111,8 +136,7 @@ export default function Navbar() {
               </span>
             )}
           </Link>
-          {/* <FontAwesomeIcon className='text-xl' icon={faCircleUser} /> */}
-          {token ? (
+          {user ? (
             <Menu
               className="user-menu"
               onClick={onClick}
