@@ -5,11 +5,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getBookById } from "../services/bookService";
 import { useCart } from "./useCart";
 import { addWishlistBook, removeWishlistBook, getWishlist } from "../services/wishlistService";
+import { useAuth } from "../context/AuthContext";
 
 const useBookDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
-  const token = localStorage.getItem("token") || "";
+  const { user } = useAuth();
+  const token = user ? localStorage.getItem("token") : "";
   const navigate = useNavigate();
   const [messageApi, contextHolder] = message.useMessage();
   const [isModalOpen, setIsModalOpen] = useState(false);

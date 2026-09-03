@@ -4,12 +4,15 @@ import AuthForm from "./components/AuthForm";
 import { login, register } from "../../services/authService";
 import { Form, message } from "antd";
 import loginImage from "../../assets/Login.jpg";
+import { useAuth } from "../../context/AuthContext";
+import { getMe } from "../../services/userService";
 
 const Auth = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [form] = Form.useForm();
   const nav = useNavigate();
   const location = useLocation();
+  const { login: setAuthLogin } = useAuth();
 
   const isLogin = location.pathname === "/login";
 
@@ -17,11 +20,19 @@ const Auth = () => {
     mutationFn: (data) => {
       return isLogin ? login(data) : register(data);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (isLogin) {
-        localStorage.setItem("token", data.token);
-        if (data.user) {
-          localStorage.setItem("user", JSON.stringify(data.user));
+        let userObj = data.user;
+        if (!userObj) {
+          try {
+            const res = await getMe();
+            userObj = res?.user;
+          } catch {
+            userObj = null;
+          }
+        }
+        if (data.token) {
+          setAuthLogin(data.token, userObj);
         }
         form.resetFields();
         messageApi.open({
