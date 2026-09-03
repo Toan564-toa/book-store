@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { getMyOrders } from "../../services/orderService";
 import { formatVND } from "../../components/format/Format";
-import ProtectedRoute from "../../components/ProtectedRoute";
 
 const statusMap = {
   pending: { label: "Chờ xác nhận", color: "text-yellow-700 bg-yellow-50" },
@@ -12,7 +11,7 @@ const statusMap = {
   cancelled: { label: "Đã hủy", color: "text-red-700 bg-red-50" },
 };
 
-const Orders = () => {
+const AccountOrders = () => {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["myOrders"],
     queryFn: () => getMyOrders({ page: 1, limit: 10 }),
@@ -21,15 +20,17 @@ const Orders = () => {
   const orders = data?.orders ?? [];
 
   return (
-    <main className="px-5 py-8 text-[#334b3b] sm:px-8 lg:px-12">
-      <h1 className="mb-6 text-2xl font-semibold">Đơn hàng của tôi</h1>
+    <div>
+      <h2 className="mb-4 text-lg font-semibold">Đơn hàng của tôi</h2>
       {isError && (
-        <p className="mb-4 text-sm text-red-600">Lỗi máy chủ, vui lòng quay lại sau!</p>
+        <p className="mb-4 text-sm text-red-600">
+          Lỗi máy chủ, vui lòng quay lại sau!
+        </p>
       )}
       {isLoading ? (
         <p className="text-gray-500">Đang tải...</p>
       ) : orders.length === 0 ? (
-        <p className="rounded-lg bg-white p-8 text-center text-gray-500">
+        <p className="rounded-lg bg-gray-50 p-8 text-center text-gray-500">
           Bạn chưa có đơn hàng nào.
         </p>
       ) : (
@@ -38,14 +39,14 @@ const Orders = () => {
             <Link
               key={order._id}
               to={`/orders/${order._id}`}
-              className="block rounded-lg bg-white p-5 shadow-sm transition hover:shadow-md"
+              className="block rounded-lg border border-gray-100 p-4 transition hover:border-[#31563d] hover:shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs text-gray-500">
                     Mã đơn: {order._id}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="mt-1 text-xs text-gray-400">
                     {new Date(order.createdAt).toLocaleDateString("vi-VN")}
                   </p>
                 </div>
@@ -57,7 +58,7 @@ const Orders = () => {
                   {statusMap[order.status]?.label || order.status}
                 </span>
               </div>
-              <div className="mt-4 flex items-center justify-between">
+              <div className="mt-3 flex items-center justify-between">
                 <span className="text-sm text-gray-600">
                   {order.items?.length ?? 0} sản phẩm
                 </span>
@@ -67,14 +68,8 @@ const Orders = () => {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 };
 
-export default function OrdersPage() {
-  return (
-    <ProtectedRoute>
-      <Orders />
-    </ProtectedRoute>
-  );
-}
+export default AccountOrders;

@@ -57,9 +57,9 @@ export default function Navbar() {
     if (e.key === "1") {
       navigate("/profile");
     } else if (e.key === "2") {
-      navigate("/orders");
+      navigate("/profile/orders");
     } else if (e.key === "3") {
-      navigate("/wishlist");
+      navigate("/profile/wishlist");
     } else if (e.key === "4") {
       logoutMutaion.mutate();
     }
