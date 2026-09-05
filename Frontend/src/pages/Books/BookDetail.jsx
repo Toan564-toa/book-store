@@ -6,12 +6,21 @@
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Image, Modal, Skeleton } from "antd";
-import { useQuery } from "@tanstack/react-query";
+import { Button, Form, Image, Input, Modal, Rate, Skeleton } from "antd";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { formatVND } from "../../components/format/Format";
 import useBookDetail from "../../hooks/useBookDetail";
-import { getAllBookReviews } from "../../services/reviewService";
+import { useAuth } from "../../context/AuthContext";
+import { getAllMyOrders } from "../../services/orderService";
+import { createReview, getAllBookReviews } from "../../services/reviewService";
+
+const REVIEW_ERROR = {
+  "You can only review completed purchased books":
+    "Bạn chỉ có thể nhận xét sách đã mua và hoàn tất đơn hàng.",
+  "You already reviewed this book": "Bạn đã nhận xét sách này rồi.",
+  "Rating must be from 1 to 5": "Điểm đánh giá phải từ 1 đến 5.",
+};
 
 const BookDetail = () => {
   const {
@@ -27,9 +36,15 @@ const BookDetail = () => {
     handleCancel,
     handleToCart,
     handleFav,
+    setIsModalOpen,
+    messageApi,
+    token,
   } = useBookDetail();
 
   const { id } = useParams();
+  const { user } = useAuth();
+  const [form] = Form.useForm();
+  const queryClient = useQueryClient();
 
   const { data: reviewsData, isLoading: isReviewsLoading } = useQuery({
     queryKey: ["bookReviews", id],
@@ -37,7 +52,50 @@ const BookDetail = () => {
     enabled: Boolean(id),
   });
 
+  const { data: ordersData, isLoading: isOrdersLoading } = useQuery({
+    queryKey: ["myOrdersAll"],
+    queryFn: getAllMyOrders,
+    enabled: Boolean(token),
+  });
+
   const reviews = reviewsData?.reviews ?? [];
+  const alreadyReviewed = reviews.some(
+    (review) => String(review.userId?._id || review.userId) === String(user?._id),
+  );
+  // ponytail: O(n) scan of my-orders; add GET /books/:id/can-review if this page gets slow
+  const canReview = (ordersData?.orders ?? []).some(
+    (order) =>
+      order.status === "completed" &&
+      order.items?.some(
+        (item) => String(item.bookId?._id || item.bookId) === String(id),
+      ),
+  );
+
+  const reviewMutation = useMutation({
+    mutationFn: (values) => createReview(id, values),
+    onSuccess: () => {
+      form.resetFields();
+      messageApi.success("Đã gửi nhận xét!");
+      queryClient.invalidateQueries({ queryKey: ["bookReviews", id] });
+      queryClient.invalidateQueries({ queryKey: ["booksDetail", { id }] });
+    },
+    onError: (error) => {
+      const apiMessage = error?.response?.data?.message;
+      messageApi.error(
+        REVIEW_ERROR[apiMessage] ||
+          apiMessage ||
+          "Gửi nhận xét thất bại, vui lòng thử lại sau!",
+      );
+    },
+  });
+
+  const onReviewFinish = ({ rating, comment }) => {
+    if (!token) {
+      setIsModalOpen(true);
+      return;
+    }
+    reviewMutation.mutate({ rating, comment: comment.trim() });
+  };
 
   const discountPercent =
     data?.book?.discountPrice && data?.book?.price
@@ -50,22 +108,22 @@ const BookDetail = () => {
   return (
     <main className="text-[#334b3b] sm:px-8 lg:px-12 py-2.5">
       {contextHolder}
+      <Modal
+        title="Bạn muốn đăng nhập?"
+        closable={{ "aria-label": "Custom Close Button" }}
+        open={isModalOpen}
+        onOk={handleOk}
+        okText="Đăng nhập"
+        cancelText="Hủy"
+        onCancel={handleCancel}
+      >
+        <p>Vui lòng đăng nhập để thực hiện hành động!</p>
+      </Modal>
       {isError && <h2>Lỗi máy chủ, vui lòng quay lại sau</h2>}
       {isLoading ? (
         <Skeleton active />
       ) : (
         <section className="grid gap-8 border-b border-[#e8e6dc] pb-10 lg:grid-cols-[1fr_1.35fr] lg:gap-14">
-          <Modal
-            title="Bạn muốn đăng nhập?"
-            closable={{ "aria-label": "Custom Close Button" }}
-            open={isModalOpen}
-            onOk={handleOk}
-            okText="Đăng nhập"
-            cancelText="Hủy"
-            onCancel={handleCancel}
-          >
-            <p>Vui lòng đăng nhập để thực hiện hành động!</p>
-          </Modal>
           <div className="flex min-h-[390px] items-center justify-center rounded-lg bg-white p-3 shadow-sm">
             <Image
               className="h-[360px] w-full rounded object-cover sm:w-[290px]"
@@ -171,6 +229,64 @@ const BookDetail = () => {
 
         <aside className="rounded-lg bg-[#f1f0e8] p-6">
           <h2 className="text-lg font-medium">Nhận xét từ độc giả</h2>
+          {!token ? (
+            <p className="mt-4 text-xs text-[#687166]">
+              <button
+                type="button"
+                className="font-medium text-[#31563d] underline"
+                onClick={() => setIsModalOpen(true)}
+              >
+                Đăng nhập
+              </button>{" "}
+              để nhận xét sau khi hoàn tất đơn hàng.
+            </p>
+          ) : isReviewsLoading || isOrdersLoading ? (
+            <p className="mt-4 text-xs text-gray-500">Đang kiểm tra quyền nhận xét...</p>
+          ) : alreadyReviewed ? (
+            <p className="mt-4 text-xs text-[#687166]">
+              Bạn đã gửi nhận xét cho sách này.
+            </p>
+          ) : !canReview ? (
+            <p className="mt-4 text-xs text-[#687166]">
+              Chỉ độc giả đã mua và hoàn tất đơn hàng mới được nhận xét sách này.
+            </p>
+          ) : (
+            <Form
+              form={form}
+              layout="vertical"
+              className="mt-4"
+              initialValues={{ rating: 5 }}
+              onFinish={onReviewFinish}
+            >
+              <Form.Item
+                label="Đánh giá"
+                name="rating"
+                rules={[{ required: true, message: "Vui lòng chọn số sao!" }]}
+              >
+                <Rate allowClear={false} />
+              </Form.Item>
+              <Form.Item
+                label="Bình luận"
+                name="comment"
+                rules={[
+                  { required: true, message: "Vui lòng nhập nhận xét!" },
+                  { min: 3, message: "Nhận xét phải có ít nhất 3 ký tự!" },
+                ]}
+              >
+                <Input.TextArea rows={3} placeholder="Chia sẻ cảm nhận của bạn..." />
+              </Form.Item>
+              <Form.Item className="mb-2">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={reviewMutation.isPending}
+                  className="bg-[#31563d]"
+                >
+                  Gửi nhận xét
+                </Button>
+              </Form.Item>
+            </Form>
+          )}
           <div className="mt-4 flex items-center gap-3 text-sm">
             <span className="text-[#31563d]">
               {[1, 2, 3, 4, 5].map((star) => (

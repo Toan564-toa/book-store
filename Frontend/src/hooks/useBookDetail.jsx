@@ -92,6 +92,9 @@ const useBookDetail = () => {
     handleCancel,
     handleToCart,
     handleFav,
+    setIsModalOpen,
+    messageApi,
+    token,
   };
 };
 
